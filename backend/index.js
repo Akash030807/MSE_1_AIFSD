@@ -1,9 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors'); // ✅ added
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors()); // ✅ added
+app.use(express.json());
+
 
 //design schema for book
 const bookSchema = new mongoose.Schema({
@@ -20,11 +26,8 @@ const bookSchema = new mongoose.Schema({
     status: { type: String, default: "Available" }
 });
 
-//model for book
 const Book = mongoose.model('Book', bookSchema);
 
-// Middleware
-app.use(express.json());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -75,7 +78,6 @@ app.get('/books', async (req, res) => {
 // Get book by ID
 app.get('/books/:id', async (req, res) => {
     try {
-
         const book = await Book.findById(req.params.id);
 
         if (!book) {
@@ -93,7 +95,6 @@ app.get('/books/:id', async (req, res) => {
 // delete book by id
 app.delete('/books/:id', async (req, res) => {
     try {
-
         const result = await Book.deleteOne({ _id: req.params.id });
 
         if (result.deletedCount === 0) {
@@ -111,7 +112,6 @@ app.delete('/books/:id', async (req, res) => {
 //update book by id
 app.put('/books/:id', async (req, res) => {
     try {
-
         const book = await Book.findByIdAndUpdate(
             req.params.id,
             req.body
@@ -132,7 +132,6 @@ app.put('/books/:id', async (req, res) => {
 //search book by title
 app.get('/books/search', async (req, res) => {
     try {
-
         const { title } = req.query;
 
         const books = await Book.find({
